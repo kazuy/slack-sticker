@@ -6,3 +6,5 @@ services:
       dockerfile: ./Dockerfile
     volumes:
       - .:/home/usr/slack-sticker/app
+    env_file:
+      - .env
