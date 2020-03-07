@@ -7,6 +7,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/joncalhoun/qson"
 	"github.com/slack-go/slack"
 )
 
@@ -18,9 +19,9 @@ type Response events.APIGatewayProxyResponse
 
 // Handler is our lambda handler invoked by the `lambda.Start` function call
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (Response, error) {
-    log.Printf("Body: %s\n", request.Body)
+    sc := QueryParameterToSlashCommand(request.Body)
 
-    msg := Message()
+    msg := Message(sc)
 
 	resp := Response{
 		StatusCode:      200,
@@ -39,14 +40,31 @@ func main() {
 	lambda.Start(Handler)
 }
 
-func Message() string {
+func QueryParameterToSlashCommand(q string) *slack.SlashCommand {
+    log.Printf("Body: %s\n", q)
+
+    b, err := qson.ToJSON(q)
+    if err != nil {
+        log.Fatal("Convert failed: ", err)
+    }
+
+    s := new(slack.SlashCommand)
+    err = json.Unmarshal(b, s)
+    if err != nil {
+        log.Fatal("Convert failed: ", err)
+    }
+
+    return s
+}
+
+func Message(sc *slack.SlashCommand) string {
     params := &slack.Msg {
-        Text: "Test",
+        Text: sc.Text,
     }
 
     b, err := json.Marshal(params)
     if err != nil {
-        log.Printf("Convert Error")
+        log.Fatal("Convert failed: ", err)
     }
 
     return string(b)
