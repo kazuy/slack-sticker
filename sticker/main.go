@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"log"
+	"encoding/json"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/slack-go/slack"
 )
 
 // Response is of type APIGatewayProxyResponse since we're leveraging the
@@ -18,10 +20,12 @@ type Response events.APIGatewayProxyResponse
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (Response, error) {
     log.Printf("Body: %s\n", request.Body)
 
+    msg := Message()
+
 	resp := Response{
 		StatusCode:      200,
 		IsBase64Encoded: false,
-		Body:            "true",
+		Body:            msg,
 		Headers: map[string]string{
 			"Content-Type":           "application/json",
 			"X-MyCompany-Func-Reply": "sticker-handler",
@@ -35,3 +39,15 @@ func main() {
 	lambda.Start(Handler)
 }
 
+func Message() string {
+    params := &slack.Msg {
+        Text: "Test",
+    }
+
+    b, err := json.Marshal(params)
+    if err != nil {
+        log.Printf("Convert Error")
+    }
+
+    return string(b)
+}
