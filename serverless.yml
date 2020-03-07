@@ -33,6 +33,11 @@ package:
 functions:
   sticker:
     handler: bin/sticker
+    environment:
+      TZ: Asia/Tokyo
+      SLASH_TOKEN: ${ssm:/slack-sticker/dev/SLASH_TOKEN}
+      LEGACY_TOKEN: ${ssm:/slack-sticker/dev/LEGACY_TOKEN}
+      WEBHOOK_URL: ${ssm:/slack-sticker/dev/WEBHOOK_URL}
     events:
       - http:
           path: sticker
