@@ -36,7 +36,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (Respon
     user := GetUserProfile(sc.UserID)
     log.Printf("user: %s, %s, %s \n", user.DisplayName, user.RealName, user.Image72)
 
-    PostMessage(sc.ChannelName, user.RealName, user.Image72, image)
+    PostMessage(sc.ChannelName, user.DisplayName, user.Image72, image)
     log.Printf("Post Message \n")
 
 	resp := Response{
