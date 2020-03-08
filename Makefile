@@ -1,4 +1,4 @@
-.PHONY: build clean deploy gomodgen
+.PHONY: build clean deploy format gomodgen
 
 build: gomodgen
 	export GO111MODULE=on
@@ -9,6 +9,9 @@ clean:
 
 deploy: clean build
 	sls deploy --verbose
+
+format:
+	go fmt ./sticker
 
 gomodgen:
 	chmod u+x gomod.sh
