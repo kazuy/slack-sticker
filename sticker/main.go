@@ -36,7 +36,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (Respon
     user := GetUserProfile(sc.UserID)
     log.Printf("user: %s, %s, %s \n", user.DisplayName, user.RealName, user.Image72)
 
-    PostMessage(sc.ChannelName, user.DisplayName, user.Image72, image)
+    PostMessage(sc, user, image)
     log.Printf("Post Message \n")
 
 	resp := Response{
@@ -95,14 +95,19 @@ func GetUserProfile(key string) *slack.UserProfile {
     return profile
 }
 
-func PostMessage(channel string, userName string, userIcon string, image string) {
-    log.Printf("channel: %s, image: %s \n", channel, image)
+func PostMessage(sc *slack.SlashCommand, u *slack.UserProfile, image string) {
+    name := u.RealName
+    if u.DisplayName != "" {
+        name = u.DisplayName
+    }
+
+    log.Printf("channel: %s, user: %s, image: %s \n", sc.ChannelName, name, image)
 
     message := slack.WebhookMessage {
         Text: " ",
-        Channel: "#" + channel,
-        Username: userName,
-        IconURL: userIcon,
+        Channel: "#" + sc.ChannelName,
+        Username: name,
+        IconURL: u.Image72,
         Attachments: []slack.Attachment {
             slack.Attachment {
                 ImageURL: image,
